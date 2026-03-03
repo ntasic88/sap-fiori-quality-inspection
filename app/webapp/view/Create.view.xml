@@ -1,0 +1,92 @@
+<mvc:View
+    controllerName="qi.app.controller.Create"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:core="sap.ui.core">
+
+    <f:DynamicPage id="createPage" showFooter="true">
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="{i18n>createTitle}" />
+                </f:heading>
+                <f:navigationActions>
+                    <Button
+                        icon="sap-icon://nav-back"
+                        tooltip="{i18n>detailBackButton}"
+                        press=".onCancel"
+                        type="Transparent" />
+                </f:navigationActions>
+            </f:DynamicPageTitle>
+        </f:title>
+
+        <f:content>
+            <VBox class="sapUiResponsiveMargin">
+                <Panel>
+                    <form:SimpleForm
+                        id="createForm"
+                        editable="true"
+                        layout="ResponsiveGridLayout"
+                        labelSpanXL="3" labelSpanL="3" labelSpanM="3" labelSpanS="12"
+                        emptySpanXL="4" emptySpanL="4" emptySpanM="0"
+                        columnsXL="1" columnsL="1" columnsM="1">
+                        <form:content>
+                            <Label text="{i18n>createMaterialNumber}" required="true" />
+                            <Input id="materialNumber" placeholder="e.g. MAT-1234" />
+
+                            <Label text="{i18n>createMaterialDesc}" required="true" />
+                            <Input id="materialDesc" placeholder="e.g. Ibuprofen 400mg Tablets" />
+
+                            <Label text="{i18n>createPlant}" required="true" />
+                            <Select id="plant">
+                                <core:Item key="DE01" text="DE01 - Ingelheim" />
+                                <core:Item key="US02" text="US02 - Ridgefield" />
+                                <core:Item key="CN03" text="CN03 - Shanghai" />
+                            </Select>
+
+                            <Label text="{i18n>createInspType}" required="true" />
+                            <Select id="inspType">
+                                <core:Item key="01 - Goods Receipt" text="01 - Goods Receipt" />
+                                <core:Item key="03 - In-Process" text="03 - In-Process" />
+                                <core:Item key="04 - Final Inspection" text="04 - Final Inspection" />
+                            </Select>
+
+                            <Label text="{i18n>createInspector}" required="true" />
+                            <Input id="inspector" placeholder="e.g. Dr. Maria Schmidt" />
+
+                            <Label text="{i18n>createQuantity}" required="true" />
+                            <Input id="quantity" type="Number" placeholder="e.g. 50000" />
+
+                            <Label text="{i18n>createUoM}" required="true" />
+                            <Select id="uom">
+                                <core:Item key="TAB" text="TAB - Tablets" />
+                                <core:Item key="CAP" text="CAP - Capsules" />
+                                <core:Item key="BTL" text="BTL - Bottles" />
+                                <core:Item key="PEN" text="PEN - Pens" />
+                                <core:Item key="AMP" text="AMP - Ampoules" />
+                            </Select>
+
+                            <Label text="{i18n>createBatch}" required="true" />
+                            <Input id="batchNumber" placeholder="e.g. BATCH-2025-0042" />
+                        </form:content>
+                    </form:SimpleForm>
+                </Panel>
+            </VBox>
+        </f:content>
+
+        <f:footer>
+            <OverflowToolbar>
+                <ToolbarSpacer />
+                <Button
+                    text="{i18n>createSave}"
+                    type="Emphasized"
+                    press=".onSave" />
+                <Button
+                    text="{i18n>createCancel}"
+                    press=".onCancel" />
+            </OverflowToolbar>
+        </f:footer>
+    </f:DynamicPage>
+</mvc:View>

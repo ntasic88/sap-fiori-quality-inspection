@@ -1,0 +1,156 @@
+*----------------------------------------------------------------------*
+* SAP Gateway Service Builder (SEGW) Configuration
+* Service: Z_INSPECTION_SRV
+*
+* This document describes how the OData service would be configured
+* in SAP Gateway (transaction SEGW), equivalent to:
+*   - srv/inspection-service.cds (service definition)
+*   - The auto-generated OData endpoints from CAP
+*----------------------------------------------------------------------*
+
+======================================================================
+1. SERVICE PROJECT
+======================================================================
+  Project Name:        Z_INSPECTION_SRV
+  Project Description: Quality Inspection OData Service
+  Package:             ZQUALITY_INSPECTION
+  OData Version:       V4 (via SAP Gateway V4 or RAP)
+  Generation Strategy: Reference to CDS View (preferred for S/4HANA)
+
+  Generated Classes:
+    MPC (Model Provider):  ZCL_Z_INSPECTION_SRV_MPC
+    DPC (Data Provider):   ZCL_Z_INSPECTION_SRV_DPC
+
+======================================================================
+2. ENTITY TYPES
+======================================================================
+
+--- Entity Type: Inspection ---
+  Properties:
+    InspectionLotID    Edm.String(12)   [Key]
+    MaterialNumber     Edm.String(20)
+    MaterialDescription Edm.String(100)
+    Plant              Edm.String(4)
+    InspectionType     Edm.String(40)
+    Status             Edm.String(20)
+    CreatedDate        Edm.DateTime
+    Inspector          Edm.String(80)
+    Quantity           Edm.Int32
+    UnitOfMeasure      Edm.String(4)
+    BatchNumber        Edm.String(20)
+
+  CRUD Operations:
+    CREATE  → ZCL_Z_INSPECTION_SRV_DPC~INSPECTIONSET_CREATE_ENTITY
+    READ    → ZCL_Z_INSPECTION_SRV_DPC~INSPECTIONSET_GET_ENTITY
+    UPDATE  → ZCL_Z_INSPECTION_SRV_DPC~INSPECTIONSET_UPDATE_ENTITY
+    DELETE  → ZCL_Z_INSPECTION_SRV_DPC~INSPECTIONSET_DELETE_ENTITY
+    QUERY   → ZCL_Z_INSPECTION_SRV_DPC~INSPECTIONSET_GET_ENTITYSET
+
+
+--- Entity Type: InspectionResult ---
+  Properties:
+    ResultID           Edm.String(10)   [Key]
+    InspectionLotID    Edm.String(12)   [FK → Inspection]
+    CharacteristicName Edm.String(80)
+    TargetValue        Edm.String(20)
+    ActualValue        Edm.String(20)
+    Unit               Edm.String(20)
+    Tolerance          Edm.String(20)
+    Valuation          Edm.String(10)
+
+  CRUD Operations:
+    READ    → ZCL_Z_INSPECTION_SRV_DPC~INSPRESULTSET_GET_ENTITY
+    QUERY   → ZCL_Z_INSPECTION_SRV_DPC~INSPRESULTSET_GET_ENTITYSET
+
+
+======================================================================
+3. ENTITY SETS
+======================================================================
+  InspectionSet        → Entity Type: Inspection
+  InspectionResultSet  → Entity Type: InspectionResult
+
+
+======================================================================
+4. NAVIGATION PROPERTIES
+======================================================================
+  Inspection → InspectionResultSet
+    Name:           ToResults
+    Relationship:   InspToResult
+    From Role:      InspectionLot
+    To Role:        InspectionResult
+    Cardinality:    1..N
+    FK:             InspectionLotID → InspectionLotID
+
+  Equivalent in CAP:
+    Composition of many InspectionResults on Results.inspection = $self
+
+  URL pattern:
+    /sap/opu/odata/sap/Z_INSPECTION_SRV/InspectionSet('100000001')/ToResults
+    ↔ CAP: /odata/v4/InspectionService/Inspections('100000001')?$expand=Results
+
+
+======================================================================
+5. SERVICE REGISTRATION & ACTIVATION
+======================================================================
+
+  Step 1: Generate Runtime Artifacts (in SEGW)
+    - Menu → Generate → will create MPC + DPC classes
+
+  Step 2: Register Service (transaction /IWFND/MAINT_SERVICE)
+    - Technical Service Name: Z_INSPECTION_SRV
+    - System Alias: LOCAL
+    - ICF Node: /sap/opu/odata/sap/Z_INSPECTION_SRV
+
+  Step 3: Test in SAP Gateway Client (transaction /IWFND/GW_CLIENT)
+    - $metadata:  /sap/opu/odata/sap/Z_INSPECTION_SRV/$metadata
+    - Entity Set: /sap/opu/odata/sap/Z_INSPECTION_SRV/InspectionSet
+    - Single:     /sap/opu/odata/sap/Z_INSPECTION_SRV/InspectionSet('100000001')
+    - Expand:     /sap/opu/odata/sap/Z_INSPECTION_SRV/InspectionSet('100000001')?$expand=ToResults
+
+
+======================================================================
+6. ALTERNATIVE: RAP (ABAP RESTful Application Programming Model)
+======================================================================
+
+  In S/4HANA (ABAP Cloud), the preferred approach is RAP:
+
+  -- Behavior Definition --
+  managed implementation in class ZBP_INSPECTION unique;
+
+  define behavior for Z_INSPECTION_LOT alias Inspection
+  persistent table QALS
+  lock master
+  {
+    create;
+    update;
+    delete;
+
+    field ( readonly ) InspectionLotID;
+    field ( mandatory ) MaterialNumber, Plant;
+
+    determination GenerateLotID on save { create; }
+
+    association _Results { create; }
+  }
+
+  define behavior for Z_INSPECTION_RESULT alias Result
+  persistent table QASE
+  lock dependent by _InspectionLot
+  {
+    update;
+    delete;
+
+    field ( readonly ) ResultID;
+
+    association _InspectionLot;
+  }
+
+  -- Service Definition --
+  define service Z_INSPECTION_API {
+    expose Z_INSPECTION_LOT as Inspections;
+    expose Z_INSPECTION_RESULT as InspectionResults;
+  }
+
+  -- Service Binding --
+  Binding Type: OData V4 - UI
+  Service URL:  /sap/opu/odata4/sap/z_inspection_api/srvd/sap/z_inspection_api/0001/

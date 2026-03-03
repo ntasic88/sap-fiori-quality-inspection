@@ -1,0 +1,147 @@
+<mvc:View
+    controllerName="qi.app.controller.Detail"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:core="sap.ui.core">
+
+    <f:DynamicPage id="detailPage" toggleHeaderOnTitleClick="true">
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="{i18n>detailTitle}" />
+                </f:heading>
+                <f:navigationActions>
+                    <Button
+                        icon="sap-icon://nav-back"
+                        tooltip="{i18n>detailBackButton}"
+                        press=".onNavBack"
+                        type="Transparent" />
+                </f:navigationActions>
+            </f:DynamicPageTitle>
+        </f:title>
+
+        <f:header>
+            <f:DynamicPageHeader pinnable="true">
+                <ObjectHeader
+                    id="objectHeader"
+                    title="{InspectionLotID}"
+                    number="{Quantity}"
+                    numberUnit="{UnitOfMeasure}"
+                    responsive="true">
+                    <statuses>
+                        <ObjectStatus
+                            text="{Status}"
+                            state="{
+                                path: 'Status',
+                                formatter: '.formatter.statusState'
+                            }"
+                            icon="{
+                                path: 'Status',
+                                formatter: '.formatter.statusIcon'
+                            }" />
+                    </statuses>
+                    <attributes>
+                        <ObjectAttribute title="{i18n>labelMaterial}" text="{MaterialNumber} - {MaterialDescription}" />
+                        <ObjectAttribute title="{i18n>labelPlant}" text="{Plant}" />
+                        <ObjectAttribute title="{i18n>labelBatch}" text="{BatchNumber}" />
+                        <ObjectAttribute title="{i18n>labelInspector}" text="{Inspector}" />
+                    </attributes>
+                </ObjectHeader>
+            </f:DynamicPageHeader>
+        </f:header>
+
+        <f:content>
+            <VBox class="sapUiResponsiveMargin">
+                <Panel headerText="{i18n>generalInfo}" class="sapUiSmallMarginBottom">
+                    <form:SimpleForm
+                        editable="false"
+                        layout="ResponsiveGridLayout"
+                        labelSpanXL="4" labelSpanL="4" labelSpanM="4" labelSpanS="12"
+                        emptySpanXL="0" emptySpanL="0" emptySpanM="0"
+                        columnsXL="2" columnsL="2" columnsM="1">
+                        <form:content>
+                            <Label text="{i18n>labelLotID}" />
+                            <Text text="{InspectionLotID}" />
+                            <Label text="{i18n>labelMaterial}" />
+                            <Text text="{MaterialNumber}" />
+                            <Label text="{i18n>labelMaterialDesc}" />
+                            <Text text="{MaterialDescription}" />
+                            <Label text="{i18n>labelPlant}" />
+                            <Text text="{Plant}" />
+                            <Label text="{i18n>labelInspType}" />
+                            <Text text="{InspectionType}" />
+                            <Label text="{i18n>labelStatus}" />
+                            <ObjectStatus
+                                text="{Status}"
+                                state="{
+                                    path: 'Status',
+                                    formatter: '.formatter.statusState'
+                                }" />
+                            <Label text="{i18n>labelCreatedDate}" />
+                            <Text text="{
+                                path: 'CreatedDate',
+                                formatter: '.formatter.formatDate'
+                            }" />
+                            <Label text="{i18n>labelInspector}" />
+                            <Text text="{Inspector}" />
+                            <Label text="{i18n>labelQuantity}" />
+                            <Text text="{Quantity}" />
+                            <Label text="{i18n>labelUoM}" />
+                            <Text text="{UnitOfMeasure}" />
+                            <Label text="{i18n>labelBatch}" />
+                            <Text text="{BatchNumber}" />
+                        </form:content>
+                    </form:SimpleForm>
+                </Panel>
+
+                <Panel headerText="{i18n>resultsTitle}">
+                    <Table
+                        id="resultsTable"
+                        items="{Results}"
+                        alternateRowColors="true"
+                        sticky="ColumnHeaders">
+                        <columns>
+                            <Column>
+                                <Text text="{i18n>columnCharacteristic}" />
+                            </Column>
+                            <Column hAlign="Center" width="8rem">
+                                <Text text="{i18n>columnTargetValue}" />
+                            </Column>
+                            <Column hAlign="Center" width="8rem">
+                                <Text text="{i18n>columnActualValue}" />
+                            </Column>
+                            <Column hAlign="Center" width="5rem" minScreenWidth="Tablet" demandPopin="true">
+                                <Text text="{i18n>columnUnit}" />
+                            </Column>
+                            <Column hAlign="Center" width="8rem" minScreenWidth="Tablet" demandPopin="true">
+                                <Text text="{i18n>columnTolerance}" />
+                            </Column>
+                            <Column hAlign="Center" width="6rem">
+                                <Text text="{i18n>columnValuation}" />
+                            </Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem>
+                                <cells>
+                                    <Text text="{CharacteristicName}" />
+                                    <Text text="{TargetValue}" />
+                                    <Text text="{ActualValue}" />
+                                    <Text text="{Unit}" />
+                                    <Text text="{Tolerance}" />
+                                    <ObjectStatus
+                                        text="{Valuation}"
+                                        state="{
+                                            path: 'Valuation',
+                                            formatter: '.formatter.valuationState'
+                                        }" />
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                </Panel>
+            </VBox>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>

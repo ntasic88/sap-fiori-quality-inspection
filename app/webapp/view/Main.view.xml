@@ -1,0 +1,128 @@
+<mvc:View
+    controllerName="qi.app.controller.Main"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core">
+
+    <f:DynamicPage id="mainPage" headerExpanded="true" toggleHeaderOnTitleClick="true">
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="{i18n>mainTitle}" />
+                </f:heading>
+                <f:actions>
+                    <Button
+                        text="{i18n>createButton}"
+                        type="Emphasized"
+                        icon="sap-icon://add"
+                        press=".onCreatePress" />
+                </f:actions>
+            </f:DynamicPageTitle>
+        </f:title>
+
+        <f:header>
+            <f:DynamicPageHeader pinnable="true">
+                <HBox alignItems="End" wrap="Wrap">
+                    <VBox class="sapUiSmallMarginEnd">
+                        <Label text="{i18n>searchPlaceholder}" />
+                        <SearchField
+                            id="searchField"
+                            width="20rem"
+                            search=".onSearch"
+                            liveChange=".onSearch" />
+                    </VBox>
+                    <VBox class="sapUiSmallMarginEnd">
+                        <Label text="{i18n>filterStatus}" />
+                        <Select
+                            id="statusFilter"
+                            change=".onStatusFilterChange">
+                            <core:Item key="All" text="{i18n>allStatuses}" />
+                            <core:Item key="Created" text="{i18n>statusCreated}" />
+                            <core:Item key="In Progress" text="{i18n>statusInProgress}" />
+                            <core:Item key="Completed" text="{i18n>statusCompleted}" />
+                            <core:Item key="Rejected" text="{i18n>statusRejected}" />
+                        </Select>
+                    </VBox>
+                </HBox>
+            </f:DynamicPageHeader>
+        </f:header>
+
+        <f:content>
+            <Table
+                id="inspectionTable"
+                items="{
+                    path: '/Inspections',
+                    parameters: { $count: true }
+                }"
+                growing="true"
+                growingThreshold="20"
+                mode="SingleSelectMaster"
+                selectionChange=".onItemPress"
+                sticky="ColumnHeaders,HeaderToolbar"
+                alternateRowColors="true">
+
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <Title text="{i18n>mainCount}" />
+                        <ToolbarSpacer />
+                    </OverflowToolbar>
+                </headerToolbar>
+
+                <columns>
+                    <Column width="10rem">
+                        <Text text="{i18n>columnLotID}" />
+                    </Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true">
+                        <Text text="{i18n>columnMaterial}" />
+                    </Column>
+                    <Column width="6rem" minScreenWidth="Tablet" demandPopin="true" hAlign="Center">
+                        <Text text="{i18n>columnPlant}" />
+                    </Column>
+                    <Column minScreenWidth="Desktop" demandPopin="true">
+                        <Text text="{i18n>columnInspectionType}" />
+                    </Column>
+                    <Column width="8rem" hAlign="Center">
+                        <Text text="{i18n>columnStatus}" />
+                    </Column>
+                    <Column width="9rem" minScreenWidth="Tablet" demandPopin="true">
+                        <Text text="{i18n>columnDate}" />
+                    </Column>
+                    <Column minScreenWidth="Desktop" demandPopin="true">
+                        <Text text="{i18n>columnInspector}" />
+                    </Column>
+                    <Column width="10rem" minScreenWidth="Desktop" demandPopin="true">
+                        <Text text="{i18n>columnBatch}" />
+                    </Column>
+                </columns>
+
+                <items>
+                    <ColumnListItem type="Navigation">
+                        <cells>
+                            <ObjectIdentifier title="{InspectionLotID}" />
+                            <Text text="{MaterialDescription}" />
+                            <Text text="{Plant}" />
+                            <Text text="{InspectionType}" />
+                            <ObjectStatus
+                                text="{Status}"
+                                state="{
+                                    path: 'Status',
+                                    formatter: '.formatter.statusState'
+                                }"
+                                icon="{
+                                    path: 'Status',
+                                    formatter: '.formatter.statusIcon'
+                                }" />
+                            <Text text="{
+                                path: 'CreatedDate',
+                                formatter: '.formatter.formatDate'
+                            }" />
+                            <Text text="{Inspector}" />
+                            <Text text="{BatchNumber}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>

@@ -1,0 +1,21 @@
+ResultID;inspection_InspectionLotID;CharacteristicName;TargetValue;ActualValue;Unit;Tolerance;Valuation
+R001;100000001;Active Ingredient Content;400;398.5;mg;±5%;Pass
+R002;100000001;Tablet Hardness;80;82.3;N;±15%;Pass
+R003;100000001;Dissolution Rate (30 min);85;88.1;%;≥80%;Pass
+R004;100000002;Active Ingredient Content;500;497.2;mg;±5%;Pass
+R005;100000002;Weight Uniformity;650;648.8;mg;±3%;Pass
+R006;100000002;Moisture Content;2.0;1.8;%;≤3.0%;Pass
+R007;100000003;Active Ingredient Content;250;221.0;mg/5ml;±5%;Fail
+R008;100000003;pH Value;5.5;5.4;;5.0–6.0;Pass
+R009;100000003;Viscosity;150;188.0;mPa·s;±20%;Fail
+R010;100000004;Protein Concentration;100;99.8;U/ml;±5%;Pass
+R011;100000004;Sterility Test;0;0;CFU;0;Pass
+R012;100000005;Active Ingredient Content;20;19.6;mg;±5%;Pass
+R013;100000005;Capsule Integrity;100;99.8;%;≥99%;Pass
+R014;100000006;Active Ingredient Content;10;10.1;mg;±5%;Pass
+R015;100000006;Dissolution Rate (30 min);80;83.5;%;≥75%;Pass
+R016;100000006;Tablet Friability;0.5;0.3;%;≤1.0%;Pass
+R017;100000007;Active Ingredient Content;500;501.2;mg;±5%;Pass
+R018;100000007;Effervescence Time;60;52.0;sec;≤120 sec;Pass
+R019;100000008;Active Ingredient Content;20;20.3;mg;±5%;Pass
+R020;100000008;Coating Thickness;0.05;0.048;mm;±10%;Pass

@@ -1,0 +1,105 @@
+{
+  "_version": "1.42.0",
+  "sap.app": {
+    "id": "qi.app",
+    "type": "application",
+    "title": "Quality Inspection Management",
+    "description": "SAP Fiori app for managing quality inspection lots",
+    "applicationVersion": {
+      "version": "1.0.0"
+    },
+    "dataSources": {
+      "inspectionService": {
+        "uri": "/odata/v4/InspectionService/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "4.0"
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "rootView": {
+      "viewName": "qi.app.view.App",
+      "type": "XML",
+      "id": "appView"
+    },
+    "dependencies": {
+      "minUI5Version": "1.120.0",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {},
+        "sap.ui.layout": {},
+        "sap.f": {},
+        "sap.uxap": {}
+      }
+    },
+    "models": {
+      "": {
+        "dataSource": "inspectionService",
+        "type": "sap.ui.model.odata.v4.ODataModel",
+        "settings": {
+          "autoExpandSelect": true,
+          "operationMode": "Server",
+          "groupId": "$auto",
+          "synchronizationMode": "None"
+        }
+      },
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "qi.app.i18n.i18n"
+        }
+      }
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "viewType": "XML",
+        "viewPath": "qi.app.view",
+        "controlId": "app",
+        "controlAggregation": "pages",
+        "async": true
+      },
+      "routes": [
+        {
+          "name": "main",
+          "pattern": "",
+          "target": "main"
+        },
+        {
+          "name": "detail",
+          "pattern": "inspection/{inspectionId}",
+          "target": "detail"
+        },
+        {
+          "name": "create",
+          "pattern": "create",
+          "target": "create"
+        }
+      ],
+      "targets": {
+        "main": {
+          "viewName": "Main",
+          "viewLevel": 1
+        },
+        "detail": {
+          "viewName": "Detail",
+          "viewLevel": 2
+        },
+        "create": {
+          "viewName": "Create",
+          "viewLevel": 2
+        }
+      }
+    }
+  }
+}
