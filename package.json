@@ -14,7 +14,10 @@
     "@sap/cds": "^8",
     "@cap-js/sqlite": "^1",
     "@sap/xssec": "^4",
-    "express": "^4"
+    "express": "^4",
+    "@sap-cloud-sdk/connectivity": "^3",
+    "@sap-cloud-sdk/http-client": "^3",
+    "@sap-cloud-sdk/resilience": "^3"
   },
   "devDependencies": {
     "@sap/cds-dk": "^8",
@@ -59,6 +62,16 @@
         },
         "[production]": {
           "kind": "xsuaa"
+        }
+      },
+      "OP_API_INSPECTIONLOT_SRV_0001": {
+        "kind": "odata-v2",
+        "model": "srv/external/OP_API_INSPECTIONLOT_SRV_0001",
+        "credentials": {
+          "url": "https://sandbox.api.sap.com/s4hanacloud/sap/opu/odata/sap/API_INSPECTIONLOT_SRV",
+          "headers": {
+            "APIKey": "ADvvar0gFawndQgdEZBSnnO5UAKAvQ8A"
+          }
         }
       }
     }

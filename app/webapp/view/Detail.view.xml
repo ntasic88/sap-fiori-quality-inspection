@@ -12,6 +12,9 @@
                 <f:heading>
                     <Title text="{i18n>detailTitle}" />
                 </f:heading>
+                <f:expandedContent>
+                    <ObjectAttribute title="{i18n>labelLotID}" text="{InspectionLotID}" />
+                </f:expandedContent>
                 <f:navigationActions>
                     <Button
                         icon="sap-icon://nav-back"
@@ -19,223 +22,394 @@
                         press=".onNavBack"
                         type="Transparent" />
                 </f:navigationActions>
-                <f:actions>
-                    <Button
-                        text="{i18n>udAcceptButton}"
-                        type="Accept"
-                        icon="sap-icon://accept"
-                        press=".onAccept"
-                        visible="{= ${Status} === 'Created' || ${Status} === 'In Progress'}" />
-                    <Button
-                        text="{i18n>udRejectButton}"
-                        type="Reject"
-                        icon="sap-icon://decline"
-                        press=".onReject"
-                        visible="{= ${Status} === 'Created' || ${Status} === 'In Progress'}" />
-                </f:actions>
             </f:DynamicPageTitle>
         </f:title>
 
         <f:header>
             <f:DynamicPageHeader pinnable="true">
-                <ObjectHeader
-                    id="objectHeader"
-                    title="{InspectionLotID}"
-                    number="{Quantity}"
-                    numberUnit="{UnitOfMeasure}"
-                    responsive="true">
-                    <statuses>
-                        <ObjectStatus
-                            text="{Status}"
-                            state="{
-                                path: 'Status',
-                                formatter: '.formatter.statusState'
-                            }"
-                            icon="{
-                                path: 'Status',
-                                formatter: '.formatter.statusIcon'
+                <HBox wrap="Wrap">
+                    <ObjectHeader
+                        id="objectHeader"
+                        title="{InspectionLotID}"
+                        number="{Quantity}"
+                        numberUnit="{UnitOfMeasure}"
+                        responsive="true"
+                        class="sapUiSmallMarginEnd">
+                        <statuses>
+                            <ObjectStatus
+                                text="{
+                                    path: 'HasUsageDecision',
+                                    formatter: '.formatter.statusText'
+                                }"
+                                state="{
+                                    path: 'HasUsageDecision',
+                                    formatter: '.formatter.statusState'
+                                }"
+                                icon="{
+                                    path: 'HasUsageDecision',
+                                    formatter: '.formatter.statusIcon'
+                                }" />
+                            <ObjectStatus
+                                id="lotStatusDisplay"
+                                text=""
+                                state="None" />
+                        </statuses>
+                        <attributes>
+                            <ObjectAttribute title="{i18n>labelMaterial}" text="{MaterialNumber} - {MaterialDescription}" />
+                            <ObjectAttribute title="{i18n>labelPlant}" text="{Plant}" />
+                            <ObjectAttribute title="{i18n>labelBatch}" text="{BatchNumber}" />
+                            <ObjectAttribute title="{i18n>labelInspType}" text="{
+                                path: 'InspectionType',
+                                formatter: '.formatter.inspectionTypeText'
                             }" />
-                    </statuses>
-                    <attributes>
-                        <ObjectAttribute title="{i18n>labelMaterial}" text="{MaterialNumber} - {MaterialDescription}" />
-                        <ObjectAttribute title="{i18n>labelPlant}" text="{Plant}" />
-                        <ObjectAttribute title="{i18n>labelBatch}" text="{BatchNumber}" />
-                        <ObjectAttribute title="{i18n>labelInspector}" text="{Inspector}" />
-                    </attributes>
-                </ObjectHeader>
+                            <ObjectAttribute title="{i18n>labelSupplier}" text="{Supplier}" />
+                        </attributes>
+                    </ObjectHeader>
+                </HBox>
             </f:DynamicPageHeader>
         </f:header>
 
         <f:content>
-            <VBox class="sapUiResponsiveMargin">
-                <Panel headerText="{i18n>generalInfo}" class="sapUiSmallMarginBottom">
-                    <form:SimpleForm
-                        editable="false"
-                        layout="ResponsiveGridLayout"
-                        labelSpanXL="4" labelSpanL="4" labelSpanM="4" labelSpanS="12"
-                        emptySpanXL="0" emptySpanL="0" emptySpanM="0"
-                        columnsXL="2" columnsL="2" columnsM="1">
-                        <form:content>
-                            <Label text="{i18n>labelLotID}" />
-                            <Text text="{InspectionLotID}" />
-                            <Label text="{i18n>labelMaterial}" />
-                            <Text text="{MaterialNumber}" />
-                            <Label text="{i18n>labelMaterialDesc}" />
-                            <Text text="{MaterialDescription}" />
-                            <Label text="{i18n>labelPlant}" />
-                            <Text text="{Plant}" />
-                            <Label text="{i18n>labelInspType}" />
-                            <Text text="{InspectionType}" />
-                            <Label text="{i18n>labelStatus}" />
-                            <ObjectStatus
-                                text="{Status}"
-                                state="{
-                                    path: 'Status',
-                                    formatter: '.formatter.statusState'
-                                }" />
-                            <Label text="{i18n>labelCreatedDate}" />
-                            <Text text="{
-                                path: 'CreatedDate',
-                                formatter: '.formatter.formatDate'
-                            }" />
-                            <Label text="{i18n>labelInspector}" />
-                            <Text text="{Inspector}" />
-                            <Label text="{i18n>labelQuantity}" />
-                            <Text text="{Quantity}" />
-                            <Label text="{i18n>labelUoM}" />
-                            <Text text="{UnitOfMeasure}" />
-                            <Label text="{i18n>labelBatch}" />
-                            <Text text="{BatchNumber}" />
-                        </form:content>
-                    </form:SimpleForm>
-                </Panel>
-
-                <Panel headerText="{i18n>usageDecisionTitle}"
-                       visible="{= !!${UsageDecisionCode}}"
-                       class="sapUiSmallMarginBottom">
-                    <form:SimpleForm
-                        editable="false"
-                        layout="ResponsiveGridLayout"
-                        labelSpanXL="4" labelSpanL="4" labelSpanM="4" labelSpanS="12"
-                        emptySpanXL="0" emptySpanL="0" emptySpanM="0"
-                        columnsXL="2" columnsL="2" columnsM="1">
-                        <form:content>
-                            <Label text="{i18n>labelUsageDecision}" />
-                            <ObjectStatus
-                                text="{
-                                    path: 'UsageDecisionCode',
-                                    formatter: '.formatter.usageDecisionText'
-                                }"
-                                state="{
-                                    path: 'UsageDecisionCode',
-                                    formatter: '.formatter.usageDecisionState'
-                                }" />
-                            <Label text="{i18n>labelDecisionDate}" />
-                            <Text text="{
-                                path: 'UsageDecisionDate',
-                                formatter: '.formatter.formatDate'
-                            }" />
-                        </form:content>
-                    </form:SimpleForm>
-                </Panel>
-
-                <Panel headerText="{i18n>resultsTitle}">
-                    <Table
-                        id="resultsTable"
-                        items="{Results}"
-                        alternateRowColors="true"
-                        sticky="ColumnHeaders">
-                        <columns>
-                            <Column>
-                                <Text text="{i18n>columnCharacteristic}" />
-                            </Column>
-                            <Column hAlign="Center" width="8rem">
-                                <Text text="{i18n>columnTargetValue}" />
-                            </Column>
-                            <Column hAlign="Center" width="8rem">
-                                <Text text="{i18n>columnActualValue}" />
-                            </Column>
-                            <Column hAlign="Center" width="5rem" minScreenWidth="Tablet" demandPopin="true">
-                                <Text text="{i18n>columnUnit}" />
-                            </Column>
-                            <Column hAlign="Center" width="8rem" minScreenWidth="Tablet" demandPopin="true">
-                                <Text text="{i18n>columnTolerance}" />
-                            </Column>
-                            <Column hAlign="Center" width="6rem">
-                                <Text text="{i18n>columnValuation}" />
-                            </Column>
-                        </columns>
-                        <items>
-                            <ColumnListItem>
-                                <cells>
-                                    <Text text="{CharacteristicName}" />
-                                    <Text text="{TargetValue}" />
-                                    <Text text="{ActualValue}" />
-                                    <Text text="{Unit}" />
-                                    <Text text="{Tolerance}" />
-                                    <ObjectStatus
-                                        text="{Valuation}"
-                                        state="{
-                                            path: 'Valuation',
-                                            formatter: '.formatter.valuationState'
+            <IconTabBar
+                id="detailTabBar"
+                selectedKey="overview"
+                class="sapUiNoContentPadding sapUiResponsiveContentPadding"
+                stretchContentHeight="false"
+                expandable="false">
+                <items>
+                    <!-- Overview Tab -->
+                    <IconTabFilter key="overview" text="{i18n>tabOverview}" icon="sap-icon://hint">
+                        <VBox class="sapUiSmallMargin">
+                            <Panel headerText="{i18n>generalInfo}" class="sapUiSmallMarginBottom">
+                                <form:SimpleForm
+                                    editable="false"
+                                    layout="ResponsiveGridLayout"
+                                    labelSpanXL="4" labelSpanL="4" labelSpanM="4" labelSpanS="12"
+                                    emptySpanXL="0" emptySpanL="0" emptySpanM="0"
+                                    columnsXL="2" columnsL="2" columnsM="1">
+                                    <form:content>
+                                        <Label text="{i18n>labelLotID}" />
+                                        <Text text="{InspectionLotID}" />
+                                        <Label text="{i18n>labelDescription}" />
+                                        <Text text="{MaterialDescription}" />
+                                        <Label text="{i18n>labelMaterial}" />
+                                        <Text text="{MaterialNumber}" />
+                                        <Label text="{i18n>labelPlant}" />
+                                        <Text text="{Plant}" />
+                                        <Label text="{i18n>labelInspType}" />
+                                        <HBox alignItems="Center">
+                                            <core:Icon
+                                                src="{
+                                                    path: 'InspectionType',
+                                                    formatter: '.formatter.inspectionTypeIcon'
+                                                }"
+                                                class="sapUiTinyMarginEnd"
+                                                size="1rem" />
+                                            <Text text="{
+                                                path: 'InspectionType',
+                                                formatter: '.formatter.inspectionTypeText'
+                                            }" />
+                                        </HBox>
+                                        <Label text="{i18n>labelStatus}" />
+                                        <ObjectStatus
+                                            text="{
+                                                path: 'HasUsageDecision',
+                                                formatter: '.formatter.statusText'
+                                            }"
+                                            state="{
+                                                path: 'HasUsageDecision',
+                                                formatter: '.formatter.statusState'
+                                            }" />
+                                        <Label text="{i18n>labelCreatedDate}" />
+                                        <Text text="{
+                                            path: 'CreatedDate',
+                                            formatter: '.formatter.formatDate'
                                         }" />
-                                </cells>
-                            </ColumnListItem>
-                        </items>
-                    </Table>
-                </Panel>
-                <Panel headerText="{i18n>changeLogTitle}">
-                    <Table
-                        id="changeLogTable"
-                        items="{
-                            path: 'Changes',
-                            sorter: { path: 'timestamp', descending: true }
-                        }"
-                        alternateRowColors="true"
-                        sticky="ColumnHeaders">
-                        <columns>
-                            <Column width="12rem">
-                                <Text text="{i18n>columnTimestamp}" />
-                            </Column>
-                            <Column width="8rem">
-                                <Text text="{i18n>columnUser}" />
-                            </Column>
-                            <Column width="10rem">
-                                <Text text="{i18n>columnAction}" />
-                            </Column>
-                            <Column width="8rem" minScreenWidth="Tablet" demandPopin="true">
-                                <Text text="{i18n>columnField}" />
-                            </Column>
-                            <Column minScreenWidth="Tablet" demandPopin="true">
-                                <Text text="{i18n>columnOldValue}" />
-                            </Column>
-                            <Column>
-                                <Text text="{i18n>columnNewValue}" />
-                            </Column>
-                        </columns>
-                        <items>
-                            <ColumnListItem>
-                                <cells>
-                                    <Text text="{
-                                        path: 'timestamp',
-                                        formatter: '.formatter.formatTimestamp'
-                                    }" />
-                                    <Text text="{user}" />
-                                    <ObjectStatus
-                                        text="{action}"
-                                        state="{
-                                            path: 'action',
-                                            formatter: '.formatter.changeActionState'
+                                        <Label text="{i18n>labelCreatedBy}" />
+                                        <Text text="{CreatedBy}" />
+                                        <Label text="{i18n>labelBatch}" />
+                                        <Text text="{BatchNumber}" />
+                                        <Label text="{i18n>labelManufOrder}" />
+                                        <Text text="{ManufacturingOrder}" />
+                                    </form:content>
+                                </form:SimpleForm>
+                            </Panel>
+
+                            <Panel headerText="{i18n>quantitiesTitle}" class="sapUiSmallMarginBottom">
+                                <form:SimpleForm
+                                    editable="false"
+                                    layout="ResponsiveGridLayout"
+                                    labelSpanXL="4" labelSpanL="4" labelSpanM="4" labelSpanS="12"
+                                    emptySpanXL="0" emptySpanL="0" emptySpanM="0"
+                                    columnsXL="3" columnsL="3" columnsM="1">
+                                    <form:content>
+                                        <Label text="{i18n>labelLotQuantity}" />
+                                        <Text text="{
+                                            parts: ['Quantity', 'UnitOfMeasure'],
+                                            formatter: '.formatter.formatQuantityWithUnit'
                                         }" />
-                                    <Text text="{field}" />
-                                    <Text text="{oldValue}" />
-                                    <Text text="{newValue}" />
-                                </cells>
-                            </ColumnListItem>
-                        </items>
-                    </Table>
-                </Panel>
-            </VBox>
+                                        <Label text="{i18n>labelActualQuantity}" />
+                                        <Text text="{
+                                            parts: ['ActualQuantity', 'UnitOfMeasure'],
+                                            formatter: '.formatter.formatQuantityWithUnit'
+                                        }" />
+                                        <Label text="{i18n>labelDefectiveQuantity}" />
+                                        <Text text="{
+                                            parts: ['DefectiveQuantity', 'UnitOfMeasure'],
+                                            formatter: '.formatter.formatQuantityWithUnit'
+                                        }" />
+                                    </form:content>
+                                </form:SimpleForm>
+                            </Panel>
+
+                            <Panel headerText="{i18n>procurementTitle}" class="sapUiSmallMarginBottom">
+                                <form:SimpleForm
+                                    editable="false"
+                                    layout="ResponsiveGridLayout"
+                                    labelSpanXL="4" labelSpanL="4" labelSpanM="4" labelSpanS="12"
+                                    emptySpanXL="0" emptySpanL="0" emptySpanM="0"
+                                    columnsXL="2" columnsL="2" columnsM="1">
+                                    <form:content>
+                                        <Label text="{i18n>labelSupplier}" />
+                                        <Text text="{Supplier}" />
+                                        <Label text="{i18n>labelPurchOrg}" />
+                                        <Text text="{PurchasingOrganization}" />
+                                        <Label text="{i18n>labelPurchDoc}" />
+                                        <Text text="{PurchasingDocument}" />
+                                        <Label text="{i18n>labelSalesOrder}" />
+                                        <Text text="{SalesOrder}" />
+                                    </form:content>
+                                </form:SimpleForm>
+                            </Panel>
+
+                            <!-- Lot Status Panel (loaded separately) -->
+                            <Panel id="statusPanel" headerText="{i18n>lotStatusTitle}" class="sapUiSmallMarginBottom">
+                                <form:SimpleForm
+                                    id="statusForm"
+                                    editable="false"
+                                    layout="ResponsiveGridLayout"
+                                    labelSpanXL="4" labelSpanL="4" labelSpanM="4" labelSpanS="12"
+                                    emptySpanXL="0" emptySpanL="0" emptySpanM="0"
+                                    columnsXL="2" columnsL="2" columnsM="1">
+                                    <form:content>
+                                        <Label text="{i18n>statusCreated}" />
+                                        <core:Icon id="statusCreatedIcon" src="sap-icon://status-inactive" color="Default" />
+                                        <Label text="{i18n>statusReleased}" />
+                                        <core:Icon id="statusReleasedIcon" src="sap-icon://status-inactive" color="Default" />
+                                        <Label text="{i18n>statusResultsConfirmed}" />
+                                        <core:Icon id="statusResultsIcon" src="sap-icon://status-inactive" color="Default" />
+                                        <Label text="{i18n>statusCompleted}" />
+                                        <core:Icon id="statusCompletedIcon" src="sap-icon://status-inactive" color="Default" />
+                                        <Label text="{i18n>statusCanceled}" />
+                                        <core:Icon id="statusCanceledIcon" src="sap-icon://status-inactive" color="Default" />
+                                    </form:content>
+                                </form:SimpleForm>
+                            </Panel>
+                        </VBox>
+                    </IconTabFilter>
+
+                    <!-- Characteristics Tab -->
+                    <IconTabFilter key="characteristics" text="{i18n>tabCharacteristics}" icon="sap-icon://measure" count="{detailView>/characteristicsCount}">
+                        <Table
+                            id="characteristicsTable"
+                            items="{ path: '/InspectionCharacteristics' }"
+                            alternateRowColors="true"
+                            sticky="ColumnHeaders"
+                            class="sapUiSmallMargin">
+                            <headerToolbar>
+                                <OverflowToolbar>
+                                    <Title text="{i18n>characteristicsTitle}" />
+                                </OverflowToolbar>
+                            </headerToolbar>
+                            <columns>
+                                <Column width="5rem">
+                                    <Text text="#" />
+                                </Column>
+                                <Column>
+                                    <Text text="{i18n>columnCharcName}" />
+                                </Column>
+                                <Column width="9rem" hAlign="Center">
+                                    <Text text="{i18n>columnCharcType}" />
+                                </Column>
+                                <Column width="8rem" hAlign="Center">
+                                    <Text text="{i18n>columnTargetValue}" />
+                                </Column>
+                                <Column width="12rem" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+                                    <Text text="{i18n>columnSpecLimits}" />
+                                </Column>
+                                <Column width="6rem" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+                                    <Text text="{i18n>columnUnit}" />
+                                </Column>
+                                <Column width="7rem" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+                                    <Text text="{i18n>columnSampleSize}" />
+                                </Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <cells>
+                                        <Text text="{InspectionCharacteristic}" />
+                                        <Text text="{CharacteristicName}" />
+                                        <HBox justifyContent="Center" alignItems="Center">
+                                            <core:Icon
+                                                src="{
+                                                    path: 'IsQuantitative',
+                                                    formatter: '.formatter.characteristicTypeIcon'
+                                                }"
+                                                class="sapUiTinyMarginEnd"
+                                                size="1rem" />
+                                            <Text text="{
+                                                path: 'IsQuantitative',
+                                                formatter: '.formatter.characteristicTypeText'
+                                            }" />
+                                        </HBox>
+                                        <Text text="{TargetValue}" />
+                                        <Text text="{
+                                            parts: ['LowerLimit', 'UpperLimit', 'HasLowerLimit', 'HasUpperLimit'],
+                                            formatter: '.formatter.formatSpecLimits'
+                                        }" />
+                                        <Text text="{Unit}" />
+                                        <Text text="{SampleSize}" />
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                    </IconTabFilter>
+
+                    <!-- Results Tab -->
+                    <IconTabFilter key="results" text="{i18n>tabResults}" icon="sap-icon://lab" count="{detailView>/resultsCount}">
+                        <Table
+                            id="resultsTable"
+                            items="{ path: '/InspectionResults' }"
+                            alternateRowColors="true"
+                            sticky="ColumnHeaders"
+                            class="sapUiSmallMargin">
+                            <headerToolbar>
+                                <OverflowToolbar>
+                                    <Title text="{i18n>resultsTitle}" />
+                                </OverflowToolbar>
+                            </headerToolbar>
+                            <columns>
+                                <Column width="5rem">
+                                    <Text text="#" />
+                                </Column>
+                                <Column>
+                                    <Text text="{i18n>columnCharcName}" />
+                                </Column>
+                                <Column width="8rem" hAlign="Center">
+                                    <Text text="{i18n>columnMeanValue}" />
+                                </Column>
+                                <Column width="8rem" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+                                    <Text text="{i18n>columnMinValue}" />
+                                </Column>
+                                <Column width="8rem" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+                                    <Text text="{i18n>columnMaxValue}" />
+                                </Column>
+                                <Column width="7rem" hAlign="Center">
+                                    <Text text="{i18n>columnSampleSize}" />
+                                </Column>
+                                <Column width="6rem" hAlign="Center">
+                                    <Text text="{i18n>columnValuation}" />
+                                </Column>
+                                <Column width="8rem" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+                                    <Text text="{i18n>columnInspector}" />
+                                </Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <cells>
+                                        <Text text="{InspectionCharacteristic}" />
+                                        <Text text="{CharacteristicName}" />
+                                        <Text text="{MeanValue}" />
+                                        <Text text="{MinValue}" />
+                                        <Text text="{MaxValue}" />
+                                        <Text text="{SampleSize}" />
+                                        <ObjectStatus
+                                            text="{
+                                                path: 'Valuation',
+                                                formatter: '.formatter.valuationText'
+                                            }"
+                                            state="{
+                                                path: 'Valuation',
+                                                formatter: '.formatter.valuationState'
+                                            }" />
+                                        <Text text="{Inspector}" />
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                    </IconTabFilter>
+
+                    <!-- Usage Decision Tab -->
+                    <IconTabFilter key="usageDecision" text="{i18n>tabUsageDecision}" icon="sap-icon://decision">
+                        <VBox class="sapUiSmallMargin" id="usageDecisionContent">
+                            <MessageStrip
+                                id="noDecisionStrip"
+                                text="{i18n>noUsageDecision}"
+                                type="Information"
+                                showIcon="true"
+                                visible="{= !${detailView>/hasUsageDecision}}"
+                                class="sapUiSmallMarginBottom" />
+                            <Panel
+                                id="usageDecisionPanel"
+                                headerText="{i18n>usageDecisionTitle}"
+                                visible="{detailView>/hasUsageDecision}"
+                                class="sapUiSmallMarginBottom">
+                                <form:SimpleForm
+                                    editable="false"
+                                    layout="ResponsiveGridLayout"
+                                    labelSpanXL="4" labelSpanL="4" labelSpanM="4" labelSpanS="12"
+                                    emptySpanXL="0" emptySpanL="0" emptySpanM="0"
+                                    columnsXL="2" columnsL="2" columnsM="1">
+                                    <form:content>
+                                        <Label text="{i18n>labelUDCode}" />
+                                        <Text text="{detailView>/usageDecision/UsageDecisionCode}" />
+                                        <Label text="{i18n>labelUDValuation}" />
+                                        <ObjectStatus
+                                            text="{
+                                                path: 'detailView>/usageDecision/Valuation',
+                                                formatter: '.formatter.udValuationText'
+                                            }"
+                                            state="{
+                                                path: 'detailView>/usageDecision/Valuation',
+                                                formatter: '.formatter.udValuationState'
+                                            }" />
+                                        <Label text="{i18n>labelQualityScore}" />
+                                        <HBox alignItems="Center">
+                                            <ObjectStatus
+                                                text="{detailView>/usageDecision/QualityScore}"
+                                                state="{
+                                                    path: 'detailView>/usageDecision/QualityScore',
+                                                    formatter: '.formatter.qualityScoreState'
+                                                }"
+                                                icon="{
+                                                    path: 'detailView>/usageDecision/QualityScore',
+                                                    formatter: '.formatter.qualityScoreIcon'
+                                                }" />
+                                            <Text text=" / 100" class="sapUiTinyMarginBegin" />
+                                        </HBox>
+                                        <Label text="{i18n>labelDecisionDate}" />
+                                        <Text text="{
+                                            path: 'detailView>/usageDecision/UsageDecisionDate',
+                                            formatter: '.formatter.formatDate'
+                                        }" />
+                                        <Label text="{i18n>labelDecidedBy}" />
+                                        <Text text="{detailView>/usageDecision/DecidedBy}" />
+                                        <Label text="{i18n>labelFollowUpAction}" />
+                                        <Text text="{detailView>/usageDecision/FollowUpAction}" />
+                                        <Label text="{i18n>labelChangedBy}" />
+                                        <Text text="{detailView>/usageDecision/ChangedBy}" />
+                                        <Label text="{i18n>labelChangedDate}" />
+                                        <Text text="{
+                                            path: 'detailView>/usageDecision/ChangedDate',
+                                            formatter: '.formatter.formatDate'
+                                        }" />
+                                    </form:content>
+                                </form:SimpleForm>
+                            </Panel>
+                        </VBox>
+                    </IconTabFilter>
+                </items>
+            </IconTabBar>
         </f:content>
     </f:DynamicPage>
 </mvc:View>

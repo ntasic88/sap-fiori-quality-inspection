@@ -79,11 +79,6 @@
           "name": "detail",
           "pattern": "inspection/{inspectionId}",
           "target": "detail"
-        },
-        {
-          "name": "create",
-          "pattern": "create",
-          "target": "create"
         }
       ],
       "targets": {
