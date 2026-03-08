@@ -3,8 +3,16 @@ sap.ui.define([
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/ui/model/json/JSONModel",
+    "sap/m/Dialog",
+    "sap/m/Button",
+    "sap/m/Label",
+    "sap/m/Slider",
+    "sap/m/Text",
+    "sap/m/VBox",
+    "sap/m/MessageToast",
+    "sap/m/MessageBox",
     "qi/app/model/formatter"
-], function (Controller, Filter, FilterOperator, JSONModel, formatter) {
+], function (Controller, Filter, FilterOperator, JSONModel, Dialog, Button, Label, Slider, Text, VBox, MessageToast, MessageBox, formatter) {
     "use strict";
 
     return Controller.extend("qi.app.controller.Detail", {
@@ -62,7 +70,7 @@ sap.ui.define([
             var that = this;
 
             var sPath = "/UsageDecisions('" + sLotId + "')";
-            var oContext = oModel.bindContext(sPath);
+            var oContext = oModel.bindContext(sPath, undefined, { $$groupId: "$auto.usageDecision" });
 
             oContext.requestObject().then(function (oData) {
                 if (oData && oData.UsageDecisionCode) {
@@ -83,7 +91,7 @@ sap.ui.define([
             var that = this;
 
             var sPath = "/InspectionLotStatuses('" + sLotId + "')";
-            var oContext = oModel.bindContext(sPath);
+            var oContext = oModel.bindContext(sPath, undefined, { $$groupId: "$auto.lotStatus" });
 
             oContext.requestObject().then(function (oData) {
                 if (oData) {
@@ -143,6 +151,92 @@ sap.ui.define([
 
             oStatusDisplay.setText(sText);
             oStatusDisplay.setState(sState);
+        },
+
+        onAcceptDecision: function () {
+            this._openUsageDecisionDialog("A001", "Accept", 80);
+        },
+
+        onRejectDecision: function () {
+            this._openUsageDecisionDialog("A002", "Reject", 20);
+        },
+
+        _openUsageDecisionDialog: function (sDecisionCode, sDecisionType, iDefaultScore) {
+            var oBundle = this.getView().getModel("i18n").getResourceBundle();
+            var sLotId = this._sLotId;
+            var that = this;
+
+            var oSlider = new Slider({
+                min: 0,
+                max: 100,
+                value: iDefaultScore,
+                enableTickmarks: true,
+                width: "100%"
+            });
+
+            var oScoreLabel = new Text({ text: iDefaultScore + " / 100" });
+            oSlider.attachLiveChange(function (oEvent) {
+                oScoreLabel.setText(oEvent.getParameter("value") + " / 100");
+            });
+
+            var oDialog = new Dialog({
+                title: oBundle.getText("dialogUsageDecisionTitle"),
+                type: "Message",
+                contentWidth: "400px",
+                content: new VBox({
+                    items: [
+                        new Label({ text: oBundle.getText("labelLotID") }),
+                        new Text({ text: sLotId }).addStyleClass("sapUiSmallMarginBottom"),
+                        new Label({ text: oBundle.getText("dialogDecisionType") }),
+                        new Text({ text: sDecisionType }).addStyleClass("sapUiSmallMarginBottom"),
+                        new Label({ text: oBundle.getText("dialogQualityScoreLabel") }),
+                        oSlider,
+                        oScoreLabel
+                    ]
+                }).addStyleClass("sapUiSmallMargin"),
+                beginButton: new Button({
+                    text: oBundle.getText("dialogConfirm"),
+                    type: sDecisionCode === "A001" ? "Accept" : "Reject",
+                    press: function () {
+                        var iScore = oSlider.getValue();
+                        oDialog.close();
+                        that._executeUsageDecision(sDecisionCode, iScore);
+                    }
+                }),
+                endButton: new Button({
+                    text: oBundle.getText("dialogCancel"),
+                    press: function () {
+                        oDialog.close();
+                    }
+                }),
+                afterClose: function () {
+                    oDialog.destroy();
+                }
+            });
+
+            oDialog.open();
+        },
+
+        _executeUsageDecision: function (sDecisionCode, iQualityScore) {
+            var oModel = this.getView().getModel();
+            var sLotId = this._sLotId;
+            var oBundle = this.getView().getModel("i18n").getResourceBundle();
+            var that = this;
+
+            var sPath = "/Inspections('" + sLotId + "')/InspectionService.makeUsageDecision(...)";
+            var oContext = oModel.bindContext(sPath);
+            oContext.setParameter("decisionCode", sDecisionCode);
+            oContext.setParameter("qualityScore", iQualityScore);
+
+            oContext.execute().then(function () {
+                MessageToast.show(oBundle.getText("msgUsageDecisionSuccess"));
+                // Refresh the page binding and usage decision data
+                that.getView().getElementBinding().refresh();
+                that._loadUsageDecision(sLotId);
+            }).catch(function (oError) {
+                var sMsg = oError.message || oBundle.getText("msgUsageDecisionError");
+                MessageBox.error(sMsg);
+            });
         },
 
         onNavBack: function () {

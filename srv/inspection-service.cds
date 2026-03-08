@@ -4,7 +4,6 @@ using { OP_API_INSPECTIONLOT_SRV_0001 as S4 } from './external/OP_API_INSPECTION
 @requires: 'authenticated-user'
 service InspectionService {
 
-    @readonly
     entity Inspections as projection on S4.A_InspectionLot {
         key InspectionLot as InspectionLotID,
         Material as MaterialNumber,
@@ -31,6 +30,8 @@ service InspectionService {
         SalesOrderItem,
         InspectionLotChangedBy as ChangedBy,
         InspectionLotChangeDate as ChangeDate
+    } actions {
+        action makeUsageDecision(decisionCode: String(4), qualityScore: Integer) returns String;
     };
 
     @readonly
@@ -81,7 +82,6 @@ service InspectionService {
         InspLotStsDefectsRecorded as HasDefectsRecorded
     };
 
-    @readonly
     entity UsageDecisions as projection on S4.A_InspLotUsageDecision {
         key InspectionLot,
         InspectionLotUsageDecisionCode as UsageDecisionCode,

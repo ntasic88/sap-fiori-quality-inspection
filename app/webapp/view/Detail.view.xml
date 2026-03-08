@@ -15,6 +15,12 @@
                 <f:expandedContent>
                     <ObjectAttribute title="{i18n>labelLotID}" text="{InspectionLotID}" />
                 </f:expandedContent>
+                <f:actions>
+                    <Button text="{i18n>buttonAccept}" type="Accept" icon="sap-icon://accept"
+                        press=".onAcceptDecision" visible="{= !${detailView>/hasUsageDecision}}" />
+                    <Button text="{i18n>buttonReject}" type="Reject" icon="sap-icon://decline"
+                        press=".onRejectDecision" visible="{= !${detailView>/hasUsageDecision}}" />
+                </f:actions>
                 <f:navigationActions>
                     <Button
                         icon="sap-icon://nav-back"

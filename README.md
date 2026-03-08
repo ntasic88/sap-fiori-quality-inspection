@@ -60,6 +60,10 @@ In pharmaceutical IT, all quality-relevant systems must comply with **GxP** (Goo
 
 This application demonstrates audit trail implementation — every creation, update, and usage decision is logged with timestamp, user, action, and before/after values.
 
+## Live App
+
+**https://28b5a8aetrial-dev-quality-inspection-app.cfapps.us10-001.hana.ondemand.com**
+
 ## Running Locally
 
 ```bash
