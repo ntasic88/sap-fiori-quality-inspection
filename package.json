@@ -7,14 +7,16 @@
   "scripts": {
     "start": "cds-serve",
     "watch": "cds watch",
+    "build": "cds build --production",
     "test": "node --localstorage-file /tmp/jest-ls node_modules/.bin/jest --forceExit"
   },
   "dependencies": {
     "@sap/cds": "^8",
+    "@cap-js/sqlite": "^1",
+    "@sap/xssec": "^4",
     "express": "^4"
   },
   "devDependencies": {
-    "@cap-js/sqlite": "^1",
     "@sap/cds-dk": "^8",
     "axios": "^1.13.6",
     "chai": "^4.5.0",
@@ -54,6 +56,9 @@
               "Inspector"
             ]
           }
+        },
+        "[production]": {
+          "kind": "xsuaa"
         }
       }
     }

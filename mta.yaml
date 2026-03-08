@@ -1,0 +1,54 @@
+_schema-version: "3.1"
+ID: sap-fiori-quality-inspection
+version: 1.0.0
+description: SAP Fiori Quality Inspection Management App
+
+parameters:
+  enable-parallel-deployments: true
+
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm ci
+        - npx cds build --production
+
+modules:
+  # ---------- CAP Service Module ----------
+  - name: quality-inspection-srv
+    type: nodejs
+    path: gen/srv
+    parameters:
+      memory: 256M
+      disk-quota: 512M
+    requires:
+      - name: quality-inspection-auth
+    provides:
+      - name: srv-api
+        properties:
+          srv-url: ${default-url}
+
+  # ---------- Approuter Module ----------
+  - name: quality-inspection-app
+    type: approuter.nodejs
+    path: app/
+    parameters:
+      memory: 256M
+      disk-quota: 256M
+    requires:
+      - name: quality-inspection-auth
+      - name: srv-api
+        group: destinations
+        properties:
+          name: srv-api
+          url: ~{srv-url}
+          forwardAuthToken: true
+
+resources:
+  # ---------- XSUAA Service ----------
+  - name: quality-inspection-auth
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json

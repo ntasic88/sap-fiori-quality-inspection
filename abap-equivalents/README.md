@@ -21,6 +21,8 @@ Equivalent of `srv/inspection-service.js`. Demonstrates:
 - Exception handling with `cx_` exception classes
 - Usage Decision workflow with `BAPI_INSPLOT_SETUSAGEDECISION` reference
 - Status validation before allowing state transitions
+- **GxP Audit Trail** via SAP Change Documents (CDHDR/CDPOS tables, transaction SCDO)
+- `CHANGEDOCUMENT_OPEN`/`CHANGEDOCUMENT_CLOSE` function module calls
 
 ### `z_inspection_odata.segw` — SAP Gateway Service Documentation
 Documents how the OData service would be configured in SAP Gateway (transaction SEGW). Covers:

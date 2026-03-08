@@ -139,4 +139,60 @@ describe('InspectionService', () => {
             }
         });
     });
+
+    describe('Audit Trail (GxP)', () => {
+        it('should log creation of inspection lots', async () => {
+            const { data: newLot } = await POST('/odata/v4/InspectionService/Inspections', {
+                MaterialNumber: 'MAT-AUDIT',
+                MaterialDescription: 'Audit Test Material',
+                Plant: 'DE01',
+                InspectionType: '01 - Goods Receipt',
+                Inspector: 'Audit Tester',
+                Quantity: 500,
+                UnitOfMeasure: 'TAB',
+                BatchNumber: 'BATCH-AUDIT-001'
+            }, auth);
+
+            const { data: lot } = await GET(
+                `/odata/v4/InspectionService/Inspections('${newLot.InspectionLotID}')?$expand=Changes`,
+                auth
+            );
+
+            expect(lot.Changes).to.be.an('array');
+            expect(lot.Changes.length).to.be.greaterThan(0);
+
+            const createEntry = lot.Changes.find(c => c.action === 'CREATE');
+            expect(createEntry).to.exist;
+            expect(createEntry.user).to.equal('manager');
+            expect(createEntry.timestamp).to.be.a('string');
+        });
+
+        it('should log usage decisions in audit trail', async () => {
+            // Lot 100000004 is "Created" and has results (R010-R011)
+            await POST(
+                "/odata/v4/InspectionService/Inspections('100000004')/InspectionService.recordUsageDecision",
+                { decision: 'Accept' },
+                auth
+            );
+
+            const { data: lot } = await GET(
+                "/odata/v4/InspectionService/Inspections('100000004')?$expand=Changes",
+                auth
+            );
+
+            const udEntries = lot.Changes.filter(c => c.action === 'USAGE_DECISION');
+            expect(udEntries.length).to.be.greaterThan(0);
+
+            const statusEntry = udEntries.find(c => c.field === 'Status');
+            expect(statusEntry).to.exist;
+            expect(statusEntry.oldValue).to.equal('Created');
+            expect(statusEntry.newValue).to.equal('Completed');
+            expect(statusEntry.user).to.equal('manager');
+        });
+
+        it('should expose change log as read-only', async () => {
+            const { data } = await GET('/odata/v4/InspectionService/ChangeLog', auth);
+            expect(data.value).to.be.an('array');
+        });
+    });
 });

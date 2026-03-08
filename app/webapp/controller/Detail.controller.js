@@ -21,7 +21,7 @@ sap.ui.define([
             this.getView().bindElement({
                 path: "/Inspections('" + sLotId + "')",
                 parameters: {
-                    $expand: "Results"
+                    $expand: "Results,Changes"
                 }
             });
         },

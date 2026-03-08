@@ -65,6 +65,35 @@ sap.ui.define([], function () {
             }
         },
 
+        changeActionState: function (sAction) {
+            switch (sAction) {
+                case "CREATE":
+                    return "Success";
+                case "UPDATE":
+                    return "Warning";
+                case "USAGE_DECISION":
+                    return "Information";
+                default:
+                    return "None";
+            }
+        },
+
+        formatTimestamp: function (sTimestamp) {
+            if (!sTimestamp) {
+                return "";
+            }
+            var oDate = new Date(sTimestamp);
+            return oDate.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "2-digit"
+            }) + " " + oDate.toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit"
+            });
+        },
+
         formatDate: function (sDate) {
             if (!sDate) {
                 return "";

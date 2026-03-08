@@ -1,0 +1,43 @@
+{
+  "xsappname": "quality-inspection",
+  "tenant-mode": "dedicated",
+  "scopes": [
+    {
+      "name": "$XSAPPNAME.QualityManager",
+      "description": "Quality Manager — can record usage decisions"
+    },
+    {
+      "name": "$XSAPPNAME.Inspector",
+      "description": "Inspector — can view and update inspections"
+    }
+  ],
+  "role-templates": [
+    {
+      "name": "QualityManager",
+      "description": "Quality Manager role",
+      "scope-references": ["$XSAPPNAME.QualityManager"],
+      "attribute-references": []
+    },
+    {
+      "name": "Inspector",
+      "description": "Inspector role",
+      "scope-references": ["$XSAPPNAME.Inspector"],
+      "attribute-references": []
+    }
+  ],
+  "role-collections": [
+    {
+      "name": "QualityInspection_QualityManager",
+      "description": "Quality Manager — full access including usage decisions",
+      "role-template-references": ["$XSAPPNAME.QualityManager"]
+    },
+    {
+      "name": "QualityInspection_Inspector",
+      "description": "Inspector — view and update inspections",
+      "role-template-references": ["$XSAPPNAME.Inspector"]
+    }
+  ],
+  "oauth2-configuration": {
+    "redirect-uris": ["https://*.cfapps.us10-001.hana.ondemand.com/**"]
+  }
+}

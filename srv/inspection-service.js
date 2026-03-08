@@ -1,9 +1,23 @@
 const cds = require('@sap/cds');
 
 module.exports = cds.service.impl(async function () {
-    const { Inspections, InspectionResults } = this.entities;
+    const { Inspections, InspectionResults, ChangeLog } = this.entities;
 
-    // Auto-generate InspectionLotID and set defaults on create
+    // --- Audit Trail Helper ---
+    async function logChange(InspectionLotID, user, action, field, oldValue, newValue) {
+        await INSERT.into(ChangeLog).entries({
+            ID: cds.utils.uuid(),
+            inspection_InspectionLotID: InspectionLotID,
+            timestamp: new Date().toISOString(),
+            user: user,
+            action: action,
+            field: field,
+            oldValue: oldValue != null ? String(oldValue) : null,
+            newValue: newValue != null ? String(newValue) : null
+        });
+    }
+
+    // --- CREATE ---
     this.before('CREATE', 'Inspections', async (req) => {
         if (!req.data.InspectionLotID) {
             const result = await SELECT.one
@@ -22,7 +36,13 @@ module.exports = cds.service.impl(async function () {
         }
     });
 
-    // Validate status transitions on direct update
+    this.after('CREATE', 'Inspections', async (data, req) => {
+        const user = req.user?.id || 'anonymous';
+        await logChange(data.InspectionLotID, user, 'CREATE', null, null,
+            `Inspection lot created for ${data.MaterialDescription} (${data.MaterialNumber})`);
+    });
+
+    // --- UPDATE ---
     this.before('UPDATE', 'Inspections', async (req) => {
         if (req.data.Status) {
             const current = await SELECT.one.from(Inspections, req.data.InspectionLotID);
@@ -41,7 +61,28 @@ module.exports = cds.service.impl(async function () {
         }
     });
 
-    // Record Usage Decision — bound action on Inspections
+    this.after('UPDATE', 'Inspections', async (data, req) => {
+        const user = req.user?.id || 'anonymous';
+        const lotId = data.InspectionLotID || req.data.InspectionLotID;
+
+        // Log each changed field
+        const tracked = [
+            'MaterialNumber', 'MaterialDescription', 'Plant', 'InspectionType',
+            'Status', 'Inspector', 'Quantity', 'UnitOfMeasure', 'BatchNumber'
+        ];
+
+        // Get the current state to compare
+        const current = await SELECT.one.from(Inspections).where({ InspectionLotID: lotId });
+
+        for (const field of tracked) {
+            if (req.data[field] !== undefined) {
+                await logChange(lotId, user, 'UPDATE', field,
+                    req.data['_' + field] || '', String(req.data[field]));
+            }
+        }
+    });
+
+    // --- Usage Decision ---
     this.on('recordUsageDecision', 'Inspections', async (req) => {
         const { InspectionLotID } = req.params[0];
         const { decision } = req.data;
@@ -67,6 +108,7 @@ module.exports = cds.service.impl(async function () {
 
         const newStatus = decision === 'Accept' ? 'Completed' : 'Rejected';
         const today = new Date().toISOString().split('T')[0];
+        const user = req.user?.id || 'anonymous';
 
         await UPDATE(Inspections)
             .set({
@@ -75,6 +117,12 @@ module.exports = cds.service.impl(async function () {
                 UsageDecisionDate: today
             })
             .where({ InspectionLotID });
+
+        // Audit trail for usage decision
+        await logChange(InspectionLotID, user, 'USAGE_DECISION', 'Status',
+            inspection.Status, newStatus);
+        await logChange(InspectionLotID, user, 'USAGE_DECISION', 'UsageDecisionCode',
+            null, decision);
 
         return SELECT.one.from(Inspections).where({ InspectionLotID });
     });

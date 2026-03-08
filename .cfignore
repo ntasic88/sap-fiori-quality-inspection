@@ -1,0 +1,8 @@
+node_modules/
+.git/
+test/
+abap-equivalents/
+*.sqlite
+db.sqlite
+.vscode/
+.env

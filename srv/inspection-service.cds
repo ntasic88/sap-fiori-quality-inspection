@@ -8,4 +8,6 @@ service InspectionService {
         action recordUsageDecision(decision : String(10)) returns Inspections;
     }
     entity InspectionResults as projection on db.InspectionResults;
+
+    @readonly entity ChangeLog as projection on db.ChangeLog;
 }

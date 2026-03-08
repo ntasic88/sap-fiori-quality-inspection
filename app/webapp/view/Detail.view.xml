@@ -184,6 +184,57 @@
                         </items>
                     </Table>
                 </Panel>
+                <Panel headerText="{i18n>changeLogTitle}">
+                    <Table
+                        id="changeLogTable"
+                        items="{
+                            path: 'Changes',
+                            sorter: { path: 'timestamp', descending: true }
+                        }"
+                        alternateRowColors="true"
+                        sticky="ColumnHeaders">
+                        <columns>
+                            <Column width="12rem">
+                                <Text text="{i18n>columnTimestamp}" />
+                            </Column>
+                            <Column width="8rem">
+                                <Text text="{i18n>columnUser}" />
+                            </Column>
+                            <Column width="10rem">
+                                <Text text="{i18n>columnAction}" />
+                            </Column>
+                            <Column width="8rem" minScreenWidth="Tablet" demandPopin="true">
+                                <Text text="{i18n>columnField}" />
+                            </Column>
+                            <Column minScreenWidth="Tablet" demandPopin="true">
+                                <Text text="{i18n>columnOldValue}" />
+                            </Column>
+                            <Column>
+                                <Text text="{i18n>columnNewValue}" />
+                            </Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem>
+                                <cells>
+                                    <Text text="{
+                                        path: 'timestamp',
+                                        formatter: '.formatter.formatTimestamp'
+                                    }" />
+                                    <Text text="{user}" />
+                                    <ObjectStatus
+                                        text="{action}"
+                                        state="{
+                                            path: 'action',
+                                            formatter: '.formatter.changeActionState'
+                                        }" />
+                                    <Text text="{field}" />
+                                    <Text text="{oldValue}" />
+                                    <Text text="{newValue}" />
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                </Panel>
             </VBox>
         </f:content>
     </f:DynamicPage>

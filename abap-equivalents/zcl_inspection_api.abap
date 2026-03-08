@@ -76,7 +76,14 @@ CLASS zcl_inspection_api DEFINITION
   PRIVATE SECTION.
     METHODS:
       generate_lot_id
-        RETURNING VALUE(rv_lot_id) TYPE char12.
+        RETURNING VALUE(rv_lot_id) TYPE char12,
+
+      write_change_document
+        IMPORTING iv_lot_id    TYPE char12
+                  iv_action    TYPE char20
+                  iv_field     TYPE char50
+                  iv_old_value TYPE char200 OPTIONAL
+                  iv_new_value TYPE char200 OPTIONAL.
 
 ENDCLASS.
 
@@ -303,7 +310,16 @@ CLASS zcl_inspection_api IMPLEMENTATION.
 
     COMMIT WORK.
 
-    " 8. Return updated inspection
+    " 8. Write change document for GxP audit trail
+    write_change_document(
+      iv_lot_id    = iv_lot_id
+      iv_action    = 'USAGE_DECISION'
+      iv_field     = 'Status'
+      iv_old_value = CONV #( ls_inspection-status )
+      iv_new_value = CONV #( iv_decision )
+    ).
+
+    " 9. Return updated inspection
     rs_result = get_inspection_by_id( iv_lot_id ).
   ENDMETHOD.
 
@@ -332,6 +348,44 @@ CLASS zcl_inspection_api IMPLEMENTATION.
 
       rv_lot_id = lv_max + 1.
     ENDIF.
+  ENDMETHOD.
+
+
+  METHOD write_change_document.
+*   GxP Audit Trail — equivalent of ChangeLog entity in CAP
+*   In production SAP, change documents are managed via:
+*   - Transaction SCDO: Define Change Document Object
+*   - Tables CDHDR (header) and CDPOS (item/field changes)
+*   - FM CHANGEDOCUMENT_OPEN / CHANGEDOCUMENT_CLOSE
+*
+*   The change document object ZQINSP would be created in SCDO with
+*   reference to table QALS. Every change is automatically recorded
+*   with user, timestamp, field, old value, and new value.
+
+    " Open change document
+    CALL FUNCTION 'CHANGEDOCUMENT_OPEN'
+      EXPORTING
+        objectclass = 'ZQINSP'
+        objectid    = CONV cdobjectv( iv_lot_id ).
+
+    " Write single field change
+    CALL FUNCTION 'CHANGEDOCUMENT_SINGLE_CASE'
+      EXPORTING
+        tablename  = 'QALS'
+        fieldname  = CONV fieldname( iv_field )
+        change_ind = 'U'  " Update
+        value_new  = CONV cdchngind( iv_new_value )
+        value_old  = CONV cdchngind( iv_old_value ).
+
+    " Close and commit change document
+    CALL FUNCTION 'CHANGEDOCUMENT_CLOSE'
+      EXPORTING
+        objectclass = 'ZQINSP'
+        objectid    = CONV cdobjectv( iv_lot_id )
+        date_of_change = sy-datum
+        time_of_change = sy-uzeit
+        tcode          = sy-tcode
+        username       = sy-uname.
   ENDMETHOD.
 
 ENDCLASS.
