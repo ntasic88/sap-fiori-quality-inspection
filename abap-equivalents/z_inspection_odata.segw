@@ -38,6 +38,8 @@
     Quantity           Edm.Int32
     UnitOfMeasure      Edm.String(4)
     BatchNumber        Edm.String(20)
+    UsageDecisionCode  Edm.String(10)
+    UsageDecisionDate  Edm.DateTime
 
   CRUD Operations:
     CREATE  → ZCL_Z_INSPECTION_SRV_DPC~INSPECTIONSET_CREATE_ENTITY
@@ -45,6 +47,16 @@
     UPDATE  → ZCL_Z_INSPECTION_SRV_DPC~INSPECTIONSET_UPDATE_ENTITY
     DELETE  → ZCL_Z_INSPECTION_SRV_DPC~INSPECTIONSET_DELETE_ENTITY
     QUERY   → ZCL_Z_INSPECTION_SRV_DPC~INSPECTIONSET_GET_ENTITYSET
+
+  Bound Action (Function Import):
+    Name:           RecordUsageDecision
+    HTTP Method:    POST
+    Return Type:    Inspection
+    Parameters:
+      InspectionLotID   Edm.String(12)   [Bound Entity Key]
+      Decision          Edm.String(10)   [Input: "Accept" or "Reject"]
+    Implementation: ZCL_Z_INSPECTION_SRV_DPC~RECORD_USAGE_DECISION
+    Equivalent CAP: action recordUsageDecision(decision : String(10)) returns Inspections;
 
 
 --- Entity Type: InspectionResult ---
@@ -129,6 +141,9 @@
     field ( mandatory ) MaterialNumber, Plant;
 
     determination GenerateLotID on save { create; }
+    validation ValidateStatusTransition on save { update; }
+
+    action recordUsageDecision parameter ZS_USAGE_DECISION result [1] $self;
 
     association _Results { create; }
   }

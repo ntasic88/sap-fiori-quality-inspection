@@ -1,9 +1,9 @@
-InspectionLotID;MaterialNumber;MaterialDescription;Plant;InspectionType;Status;CreatedDate;Inspector;Quantity;UnitOfMeasure;BatchNumber
-100000001;MAT-2001;Ibuprofen 400mg Tablets;DE01;01 - Goods Receipt;Completed;2025-11-15;Dr. Maria Schmidt;50000;TAB;BATCH-2025-0042
-100000002;MAT-3010;Metformin 500mg Film-Coated Tablets;DE01;03 - In-Process;In Progress;2025-12-01;Thomas Weber;120000;TAB;BATCH-2025-0078
-100000003;MAT-4500;Amoxicillin 250mg/5ml Suspension;US02;04 - Final Inspection;Rejected;2025-12-10;Sarah Johnson;8000;BTL;BATCH-2025-0091
-100000004;MAT-1200;Insulin Glargine 100U/ml Solution;DE01;01 - Goods Receipt;Created;2025-12-18;Dr. Klaus Bauer;25000;PEN;BATCH-2025-0105
-100000005;MAT-6700;Omeprazole 20mg Capsules;US02;03 - In-Process;In Progress;2025-12-20;Emily Chen;200000;CAP;BATCH-2025-0112
-100000006;MAT-8800;Lisinopril 10mg Tablets;DE01;04 - Final Inspection;Completed;2025-11-28;Dr. Maria Schmidt;75000;TAB;BATCH-2025-0063
-100000007;MAT-2200;Paracetamol 500mg Effervescent Tablets;US02;01 - Goods Receipt;Completed;2025-10-05;James Miller;300000;TAB;BATCH-2025-0029
-100000008;MAT-9100;Atorvastatin 20mg Film-Coated Tablets;DE01;03 - In-Process;Created;2025-12-22;Thomas Weber;150000;TAB;BATCH-2025-0118
+InspectionLotID;MaterialNumber;MaterialDescription;Plant;InspectionType;Status;CreatedDate;Inspector;Quantity;UnitOfMeasure;BatchNumber;UsageDecisionCode;UsageDecisionDate
+100000001;MAT-2001;Ibuprofen 400mg Tablets;DE01;01 - Goods Receipt;Completed;2025-11-15;Dr. Maria Schmidt;50000;TAB;BATCH-2025-0042;Accept;2025-11-20
+100000002;MAT-3010;Metformin 500mg Film-Coated Tablets;DE01;03 - In-Process;In Progress;2025-12-01;Thomas Weber;120000;TAB;BATCH-2025-0078;;
+100000003;MAT-4500;Amoxicillin 250mg/5ml Suspension;US02;04 - Final Inspection;Rejected;2025-12-10;Sarah Johnson;8000;BTL;BATCH-2025-0091;Reject;2025-12-15
+100000004;MAT-1200;Insulin Glargine 100U/ml Solution;DE01;01 - Goods Receipt;Created;2025-12-18;Dr. Klaus Bauer;25000;PEN;BATCH-2025-0105;;
+100000005;MAT-6700;Omeprazole 20mg Capsules;US02;03 - In-Process;In Progress;2025-12-20;Emily Chen;200000;CAP;BATCH-2025-0112;;
+100000006;MAT-8800;Lisinopril 10mg Tablets;DE01;04 - Final Inspection;Completed;2025-11-28;Dr. Maria Schmidt;75000;TAB;BATCH-2025-0063;Accept;2025-12-02
+100000007;MAT-2200;Paracetamol 500mg Effervescent Tablets;US02;01 - Goods Receipt;Completed;2025-10-05;James Miller;300000;TAB;BATCH-2025-0029;Accept;2025-10-10
+100000008;MAT-9100;Atorvastatin 20mg Film-Coated Tablets;DE01;03 - In-Process;Created;2025-12-22;Thomas Weber;150000;TAB;BATCH-2025-0118;;

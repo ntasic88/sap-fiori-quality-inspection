@@ -15,11 +15,12 @@ Equivalent of `db/schema.cds`. Demonstrates:
 
 ### `zcl_inspection_api.abap` — ABAP Class
 Equivalent of `srv/inspection-service.js`. Demonstrates:
-- ABAP OO class implementing CRUD operations
-- `SELECT`, `INSERT`, `MODIFY` patterns with proper ABAP syntax
+- ABAP OO class implementing CRUD operations and Usage Decision
+- `SELECT`, `INSERT`, `MODIFY`, `UPDATE` patterns with proper ABAP syntax
 - Number range handling for auto-generating Inspection Lot IDs
 - Exception handling with `cx_` exception classes
-- ALV grid output for testing
+- Usage Decision workflow with `BAPI_INSPLOT_SETUSAGEDECISION` reference
+- Status validation before allowing state transitions
 
 ### `z_inspection_odata.segw` — SAP Gateway Service Documentation
 Documents how the OData service would be configured in SAP Gateway (transaction SEGW). Covers:

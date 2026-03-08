@@ -43,6 +43,28 @@ sap.ui.define([], function () {
             }
         },
 
+        usageDecisionState: function (sCode) {
+            switch (sCode) {
+                case "Accept":
+                    return "Success";
+                case "Reject":
+                    return "Error";
+                default:
+                    return "None";
+            }
+        },
+
+        usageDecisionText: function (sCode) {
+            switch (sCode) {
+                case "Accept":
+                    return "Accepted";
+                case "Reject":
+                    return "Rejected";
+                default:
+                    return "";
+            }
+        },
+
         formatDate: function (sDate) {
             if (!sDate) {
                 return "";

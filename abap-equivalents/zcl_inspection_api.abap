@@ -11,17 +11,19 @@ CLASS zcl_inspection_api DEFINITION
   PUBLIC SECTION.
     TYPES:
       BEGIN OF ty_inspection,
-        inspection_lot_id  TYPE char12,
-        material_number    TYPE matnr,
-        material_desc      TYPE maktx,
-        plant              TYPE werks_d,
-        inspection_type    TYPE char40,
-        status             TYPE char20,
-        created_date       TYPE datum,
-        inspector          TYPE char80,
-        quantity           TYPE menge_d,
-        unit_of_measure    TYPE meins,
-        batch_number       TYPE charg_d,
+        inspection_lot_id   TYPE char12,
+        material_number     TYPE matnr,
+        material_desc       TYPE maktx,
+        plant               TYPE werks_d,
+        inspection_type     TYPE char40,
+        status              TYPE char20,
+        created_date        TYPE datum,
+        inspector           TYPE char80,
+        quantity            TYPE menge_d,
+        unit_of_measure     TYPE meins,
+        batch_number        TYPE charg_d,
+        usage_decision_code TYPE char10,
+        usage_decision_date TYPE datum,
       END OF ty_inspection,
 
       tt_inspections TYPE STANDARD TABLE OF ty_inspection WITH KEY inspection_lot_id,
@@ -63,6 +65,12 @@ CLASS zcl_inspection_api DEFINITION
 
       delete_inspection
         IMPORTING iv_lot_id        TYPE char12
+        RAISING   cx_sy_no_handler,
+
+      record_usage_decision
+        IMPORTING iv_lot_id        TYPE char12
+                  iv_decision      TYPE char10
+        RETURNING VALUE(rs_result) TYPE ty_inspection
         RAISING   cx_sy_no_handler.
 
   PRIVATE SECTION.
@@ -87,7 +95,9 @@ CLASS zcl_inspection_api IMPLEMENTATION.
            prufer   AS inspector,
            lmenge01 AS quantity,
            mengeneinh AS unit_of_measure,
-           charg    AS batch_number
+           charg    AS batch_number,
+           vcode    AS usage_decision_code,
+           vdatum   AS usage_decision_date
       FROM qals
       INTO TABLE @rt_inspections.
 
@@ -98,6 +108,11 @@ CLASS zcl_inspection_api IMPLEMENTATION.
         WHEN '02'. <fs_insp>-status = 'In Progress'.
         WHEN '03'. <fs_insp>-status = 'Completed'.
         WHEN '04'. <fs_insp>-status = 'Rejected'.
+      ENDCASE.
+
+      CASE <fs_insp>-usage_decision_code.
+        WHEN 'A'. <fs_insp>-usage_decision_code = 'Accept'.
+        WHEN 'R'. <fs_insp>-usage_decision_code = 'Reject'.
       ENDCASE.
     ENDLOOP.
   ENDMETHOD.
@@ -115,7 +130,9 @@ CLASS zcl_inspection_api IMPLEMENTATION.
            prufer   AS inspector,
            lmenge01 AS quantity,
            mengeneinh AS unit_of_measure,
-           charg    AS batch_number
+           charg    AS batch_number,
+           vcode    AS usage_decision_code,
+           vdatum   AS usage_decision_date
       FROM qals
       WHERE prueflos = @iv_lot_id
       INTO @rs_inspection.
@@ -210,13 +227,84 @@ CLASS zcl_inspection_api IMPLEMENTATION.
   METHOD delete_inspection.
 *   Equivalent of: DELETE /odata/v4/InspectionService/Inspections('{id}')
     DELETE FROM qals WHERE prueflos = @iv_lot_id.
+
+    IF sy-subrc <> 0.
+      RAISE EXCEPTION TYPE cx_sy_no_handler.
+    ENDIF.
+
+    " Also delete associated results
     DELETE FROM qase WHERE prueflos = @iv_lot_id.
+
+    COMMIT WORK.
+  ENDMETHOD.
+
+
+  METHOD record_usage_decision.
+*   Equivalent of: POST .../Inspections('{id}')/InspectionService.recordUsageDecision
+*   This is the core QM workflow step — records whether a lot is accepted or rejected.
+*   In production SAP, this would use BAPI_INSPLOT_SETUSAGEDECISION.
+
+    " 1. Validate the decision value
+    IF iv_decision <> 'Accept' AND iv_decision <> 'Reject'.
+      RAISE EXCEPTION TYPE cx_sy_no_handler.
+    ENDIF.
+
+    " 2. Read current inspection lot
+    DATA(ls_inspection) = get_inspection_by_id( iv_lot_id ).
+
+    " 3. Validate status — cannot re-decide already completed/rejected lots
+    IF ls_inspection-status = 'Completed' OR ls_inspection-status = 'Rejected'.
+      RAISE EXCEPTION TYPE cx_sy_no_handler.
+    ENDIF.
+
+    " 4. Verify inspection results exist
+    DATA(lt_results) = get_results_for_lot( iv_lot_id ).
+    IF lt_results IS INITIAL.
+      RAISE EXCEPTION TYPE cx_sy_no_handler.
+    ENDIF.
+
+    " 5. Determine new status and usage decision code
+    DATA: lv_new_status TYPE char2,
+          lv_vcode      TYPE char10.
+
+    IF iv_decision = 'Accept'.
+      lv_new_status = '03'.  " Completed
+      lv_vcode      = 'A'.   " Accepted
+    ELSE.
+      lv_new_status = '04'.  " Rejected
+      lv_vcode      = 'R'.   " Rejected
+    ENDIF.
+
+    " 6. In production: call BAPI for usage decision
+    " CALL FUNCTION 'BAPI_INSPLOT_SETUSAGEDECISION'
+    "   EXPORTING
+    "     insplot        = iv_lot_id
+    "     ud_code        = lv_vcode
+    "     ud_code_group  = 'ZQM01'
+    "   IMPORTING
+    "     return         = ls_return.
+    "
+    " IF ls_return-type = 'E'.
+    "   RAISE EXCEPTION TYPE cx_sy_no_handler.
+    " ENDIF.
+    "
+    " CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'
+    "   EXPORTING wait = abap_true.
+
+    " 7. Direct table update (simplified for demo)
+    UPDATE qals SET stat   = @lv_new_status,
+                     vcode  = @lv_vcode,
+                     vdatum = @sy-datum
+      WHERE prueflos = @iv_lot_id.
 
     IF sy-subrc <> 0.
       RAISE EXCEPTION TYPE cx_sy_no_handler.
     ENDIF.
 
     COMMIT WORK.
+
+    " 8. Return updated inspection
+    rs_result = get_inspection_by_id( iv_lot_id ).
   ENDMETHOD.
 
 

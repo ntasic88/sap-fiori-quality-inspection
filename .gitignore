@@ -4,5 +4,8 @@ dist/
 *.log
 .DS_Store
 db.sqlite
+db.sqlite-shm
+db.sqlite-wal
 _out/
 gen/
+.idea/

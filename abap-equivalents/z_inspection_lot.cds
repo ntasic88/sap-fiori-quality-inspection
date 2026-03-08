@@ -53,6 +53,17 @@ define view Z_INSPECTION_LOT
 
       InspectionLot.charg                 as BatchNumber,
 
+      @ObjectModel.readOnly: true
+      case InspectionLot.vcode
+        when 'A' then 'Accept'
+        when 'R' then 'Reject'
+        else ''
+      end                                 as UsageDecisionCode,
+
+      @Semantics.systemDate.lastChangedAt: true
+      @ObjectModel.readOnly: true
+      InspectionLot.vdatum                as UsageDecisionDate,
+
       -- Expose association for navigation
       _Results
 }

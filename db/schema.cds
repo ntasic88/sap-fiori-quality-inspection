@@ -11,8 +11,10 @@ entity Inspections {
         Inspector         : String(80);
         Quantity          : Integer;
         UnitOfMeasure     : String(4);
-        BatchNumber       : String(20);
-        Results           : Composition of many InspectionResults on Results.inspection = $self;
+        BatchNumber         : String(20);
+        UsageDecisionCode   : String(10);
+        UsageDecisionDate   : Date;
+        Results             : Composition of many InspectionResults on Results.inspection = $self;
 }
 
 entity InspectionResults {
