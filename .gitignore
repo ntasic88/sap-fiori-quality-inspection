@@ -8,4 +8,5 @@ db.sqlite-shm
 db.sqlite-wal
 _out/
 gen/
+mta_archives/
 .idea/
