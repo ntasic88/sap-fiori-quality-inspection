@@ -5,6 +5,22 @@
 - **Node.js** >= 18 (tested with v25)
 - **npm** >= 9 (comes with Node.js)
 
+## Quick Start with Docker (No Prerequisites)
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/nicktasic/sap-fiori-quality-inspection.git
+cd sap-fiori-quality-inspection
+
+# 2. Start the app
+docker compose up
+
+# Stop the app
+docker compose down
+```
+
+The app will be available at **http://localhost:4004/webapp/index.html**
+
 ## Quick Start (Local Development)
 
 ```bash

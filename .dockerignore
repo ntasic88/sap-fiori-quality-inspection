@@ -1,0 +1,7 @@
+node_modules
+mta_archives
+gen
+.idea
+*.log
+.DS_Store
+db.sqlite*
